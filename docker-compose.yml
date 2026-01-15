@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  db:
+    image: postgis/postgis:15-3.3
+    environment:
+      POSTGRES_USER: rv_user
+      POSTGRES_PASSWORD: rv_pass
+      POSTGRES_DB: rv_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - DATABASE_URL=postgresql://rv_user:rv_pass@db:5432/rv_db
+      - LOCATIONIQ_KEY=${LOCATIONIQ_KEY}
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    environment:
+      - VITE_LOCATIONIQ_KEY=${LOCATIONIQ_KEY}
+      - VITE_BACKEND_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/usr/src/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
