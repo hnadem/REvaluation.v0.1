@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic
+psycopg2-binary
+SQLAlchemy
+geoalchemy2
+asyncpg
+databases
+pandas
+geopandas
+requests
